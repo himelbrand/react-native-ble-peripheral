@@ -1,3 +1,3 @@
 var BLEPeripheral = require('./BLEPeripheral');
 
-module.export = BLEPeripheral;
+module.exports = BLEPeripheral;
