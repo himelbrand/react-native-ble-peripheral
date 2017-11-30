@@ -1,0 +1,25 @@
+{
+  "name": "react-native-ble-peripheral",
+  "version": "1.0.0",
+  "description": "a simulator for a BLE peripheral, to help with testing BLE apps without an actual peripheral BLE device",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/himelbrand/react-native-ble-peripheral.git"
+  },
+  "keywords": [
+    "react-native",
+    "ble",
+    "peripheral",
+    "react"
+  ],
+  "author": "Omri Himelbrand",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/himelbrand/react-native-ble-peripheral/issues"
+  },
+  "homepage": "https://github.com/himelbrand/react-native-ble-peripheral#readme"
+}
