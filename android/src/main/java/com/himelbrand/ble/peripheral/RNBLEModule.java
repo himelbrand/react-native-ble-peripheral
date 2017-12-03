@@ -228,7 +228,7 @@ public class RNBLEModule extends ReactContextBaseJavaModule{
     }
     @ReactMethod
     public void isAdvertising(Callback booleanCallback){
-        booleanCallback.invoke();
+        booleanCallback.invoke(this.advertising);
     }
 
 }
