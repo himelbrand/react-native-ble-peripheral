@@ -63,6 +63,7 @@ public class RNBLEModule extends ReactContextBaseJavaModule{
     BluetoothGattServer mGattServer;
     BluetoothLeAdvertiser advertiser;
     AdvertiseCallback advertisingCallback;
+    Boolen advertising;
     private Context context;
 
     public RNBLEModule(ReactApplicationContext reactContext) {
@@ -70,6 +71,7 @@ public class RNBLEModule extends ReactContextBaseJavaModule{
         this.reactContext = reactContext;
         this.context = reactContext;
         this.servicesMap = new HashMap<String, BluetoothGattService>();
+        this.advertising = false;
     }
 
     @Override
@@ -99,10 +101,13 @@ public class RNBLEModule extends ReactContextBaseJavaModule{
             @Override
             public void onStartSuccess(AdvertiseSettings settingsInEffect) {
                 super.onStartSuccess(settingsInEffect);
+                advertising = true;
+
             }
 
             @Override
             public void onStartFailure(int errorCode) {
+                advertising = false;
                 Log.e("RNBLEModule", "Advertising onStartFailure: " + errorCode);
                 super.onStartFailure(errorCode);
             }
@@ -218,6 +223,10 @@ public class RNBLEModule extends ReactContextBaseJavaModule{
             // true for indication (acknowledge) and false for notification (unacknowledge).
             mGattServer.notifyCharacteristicChanged(device, characteristic, indicate);
         }
+    }
+    @ReactMethod
+    public Boolean isAdvertising(){
+        return this.advertising
     }
 
 }
