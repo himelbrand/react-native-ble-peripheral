@@ -48,6 +48,8 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.common.MapBuilder;
+import com.facebook.react.bridge.Callback;
+
 
 /**
  * {@link NativeModule} that allows JS to open the default browser
@@ -63,7 +65,7 @@ public class RNBLEModule extends ReactContextBaseJavaModule{
     BluetoothGattServer mGattServer;
     BluetoothLeAdvertiser advertiser;
     AdvertiseCallback advertisingCallback;
-    Boolen advertising;
+    boolean advertising;
     private Context context;
 
     public RNBLEModule(ReactApplicationContext reactContext) {
@@ -225,8 +227,8 @@ public class RNBLEModule extends ReactContextBaseJavaModule{
         }
     }
     @ReactMethod
-    public Boolean isAdvertising(){
-        return this.advertising
+    public void isAdvertising(Callback booleanCallback){
+        booleanCallback.invoke();
     }
 
 }
