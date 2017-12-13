@@ -48,7 +48,10 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.common.MapBuilder;
-import com.facebook.react.bridge.Callback;
+import com.facebook.react.bridge.Promise;
+import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.Arguments;
+
 
 
 /**
@@ -81,42 +84,7 @@ public class RNBLEModule extends ReactContextBaseJavaModule{
         return "BLEPeripheral";
     }
 
-    @ReactMethod
-    public void advertise() {
 
-        advertiser = mBluetoothAdapter.getBluetoothLeAdvertiser();
-        AdvertiseSettings settings = new AdvertiseSettings.Builder()
-                .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY)
-                .setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_HIGH)
-                .setConnectable(true)
-                .build();
-
-
-        AdvertiseData.Builder dataBuilder = new AdvertiseData.Builder()
-                .setIncludeDeviceName(true);
-        for (BluetoothGattService service : this.servicesMap.values()) {
-            dataBuilder.addServiceUuid(new ParcelUuid(service.getUuid()));
-        }
-        AdvertiseData data = dataBuilder.build();
-
-        advertisingCallback = new AdvertiseCallback() {
-            @Override
-            public void onStartSuccess(AdvertiseSettings settingsInEffect) {
-                super.onStartSuccess(settingsInEffect);
-                advertising = true;
-
-            }
-
-            @Override
-            public void onStartFailure(int errorCode) {
-                advertising = false;
-                Log.e("RNBLEModule", "Advertising onStartFailure: " + errorCode);
-                super.onStartFailure(errorCode);
-            }
-        };
-
-        advertiser.startAdvertising(settings, data, advertisingCallback);
-    }
 
     @ReactMethod
     public void addService(String uuid, Boolean primary) {
@@ -170,22 +138,30 @@ public class RNBLEModule extends ReactContextBaseJavaModule{
         @Override
         public void onCharacteristicWriteRequest(BluetoothDevice device, int requestId,
                                                  BluetoothGattCharacteristic characteristic, boolean preparedWrite, boolean responseNeeded,
-                                                 int offset, byte[] value) {
+                                                 int offset, byte[] value, Promise promise) {
             super.onCharacteristicWriteRequest(device, requestId, characteristic, preparedWrite,
                     responseNeeded, offset, value);
-            characteristic.setValue(value);
+                    characteristic.setValue(value);
+            WritableMap map = Arguments.createMap();
+            WritabaleArray data = Arguments.createArray();
+            for (byte b : value){
+                data.pushInt((int)b);
+            }
+            map.putArray("data",data);
+            map.putString("device",device.toString());
             if (responseNeeded) {
                 mGattServer.sendResponse(device, requestId, 1,
             /* No need to respond with an offset */ 0,
             /* No need to respond with a value */ value);
             }
+            promise.resolve(map);
         }
 
 
     };
 
     @ReactMethod
-    public void start(){
+    public void start(final Promise promise){
         mBluetoothManager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
         mBluetoothAdapter = mBluetoothManager.getAdapter();
         // Ensures Bluetooth is available on the device and it is enabled. If not,
@@ -196,7 +172,40 @@ public class RNBLEModule extends ReactContextBaseJavaModule{
         for (BluetoothGattService service : this.servicesMap.values()) {
             mGattServer.addService(service);
         }
-        advertise();
+        advertiser = mBluetoothAdapter.getBluetoothLeAdvertiser();
+        AdvertiseSettings settings = new AdvertiseSettings.Builder()
+                .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY)
+                .setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_HIGH)
+                .setConnectable(true)
+                .build();
+
+
+        AdvertiseData.Builder dataBuilder = new AdvertiseData.Builder()
+                .setIncludeDeviceName(true);
+        for (BluetoothGattService service : this.servicesMap.values()) {
+            dataBuilder.addServiceUuid(new ParcelUuid(service.getUuid()));
+        }
+        AdvertiseData data = dataBuilder.build();
+
+        advertisingCallback = new AdvertiseCallback() {
+            @Override
+            public void onStartSuccess(AdvertiseSettings settingsInEffect) {
+                super.onStartSuccess(settingsInEffect);
+                advertising = true;
+                promise.resolve("Succes, Started Advertising");
+
+            }
+
+            @Override
+            public void onStartFailure(int errorCode) {
+                advertising = false;
+                Log.e("RNBLEModule", "Advertising onStartFailure: " + errorCode);
+                promise.reject("Advertising onStartFailure: " + errorCode);
+                super.onStartFailure(errorCode);
+            }
+        };
+
+        advertiser.startAdvertising(settings, data, advertisingCallback);
 
     }
     @ReactMethod
@@ -227,8 +236,8 @@ public class RNBLEModule extends ReactContextBaseJavaModule{
         }
     }
     @ReactMethod
-    public void isAdvertising(Callback booleanCallback){
-        booleanCallback.invoke(this.advertising);
+    public void isAdvertising(Promise promise){
+        promise.resolve(this.advertising);
     }
 
 }
