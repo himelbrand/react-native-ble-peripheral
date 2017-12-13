@@ -1,6 +1,8 @@
 # React Native BLE Peripheral
-Native call forwarding in React Native (no support for IOS at the moment)
-Welcome!
+Native BLE Peripheral in React Native (no support for IOS at the moment)
+
+## Welcome!
+
 this is a simulator for a BLE peripheral, to help with testing BLE apps without an actual peripheral BLE device
 this project is not yet complete,
 for all ready parts see documentation below.
