@@ -136,7 +136,7 @@ public class RNBLEModule extends ReactContextBaseJavaModule{
             super.onNotificationSent(device, status);
         }
 
-        @Override
+        
         public void onCharacteristicWriteRequest(BluetoothDevice device, int requestId,
                                                  BluetoothGattCharacteristic characteristic, boolean preparedWrite, boolean responseNeeded,
                                                  int offset, byte[] value, Promise promise) {
