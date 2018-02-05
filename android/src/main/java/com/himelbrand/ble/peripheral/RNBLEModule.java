@@ -144,7 +144,7 @@ public class RNBLEModule extends ReactContextBaseJavaModule{
                     responseNeeded, offset, value);
                     characteristic.setValue(value);
             WritableMap map = Arguments.createMap();
-            WritabaleArray data = Arguments.createArray();
+            WritableArray data = Arguments.createArray();
             for (byte b : value){
                 data.pushInt((int)b);
             }
