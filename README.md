@@ -9,7 +9,7 @@ for all ready parts see documentation below.
 (docs are not complete, feel free to improve them)
 
 ## Realease notes
-- none
+- fixed issues fixed on github repo in npm package - starting from version 1.2.0
     
 ### Still missing
 - this project have no support for IOS what so ever
