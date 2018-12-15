@@ -8,11 +8,11 @@
 
 import Foundation
 
-@objc(RNBLEPeripheral)
-class RNBLEPeripheral: NSObject {
+@objc(BLEPeripheral)
+class BLEPeripheral: NSObject {
   private var count = 0
 
-  @objc
+  @objc(increment)
   func increment() {
     count += 1
     print("count is \(count)")
