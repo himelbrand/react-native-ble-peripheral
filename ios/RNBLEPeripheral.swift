@@ -18,6 +18,7 @@ class BLEPeripheral: NSObject {
     print("count is \(count)")
   }
 
+  @objc(requiresMainQueueSetup)
   static func requiresMainQueueSetup() -> Bool {
     return false
   }
