@@ -25,45 +25,35 @@ import CoreBluetooth
         print("called addService")
     }
 
-    @objc func addCharacteristicToService() {
-
-
-        /*
-        let characteristicUUID = CBUUID(string: kCharacteristicUUID)
-        let properties: CBCharacteristicProperties = [.Notify, .Read, .Write]
-        let permissions: CBAttributePermissions = [.Readable, .Writeable]
-        let characteristic = CBMutableCharacteristic(
-            type: characteristicUUID,
-            properties: properties,
-            value: nil,
-            permissions: permissions)
-
-        // add to service
-        // service.characteristics = @[characteristic, characteristic2];
-        service.characteristics = @[characteristic];
-        */
+    @objc func addCharacteristicToService(_ serviceUUID: String, _ uuid: String, _ permissions: UInt, _ properties: UInt, _ data: String) {
+        let characteristicUUID = CBUUID(string: uuid)
+        let propertyValue = CBCharacteristicProperties(rawValue: properties)
+        let permissionValue = CBAttributePermissions(rawValue: permissions)
+        let byteData: Data = data.data(using: .utf8)!
+        let characteristic = CBMutableCharacteristic( type: characteristicUUID, properties: propertyValue, value: byteData, permissions: permissionValue)
+        servicesMap[serviceUUID]?.characteristics?.append(characteristic)
         print("called addCharacteristicToService")
     }
-    
+
     @objc func start() {
-        print("called start")
-        let advertisementData = [CBAdvertisementDataLocalNameKey: "Test Device"]
+        let advertisementData = [CBAdvertisementDataLocalNameKey: "Test data"]
         peripheralManager.startAdvertising(advertisementData)
+        print("called start")
     }
-    
+
     @objc func stop() {
-        print("called stop")
         peripheralManager.stopAdvertising()
+        print("called stop")
     }
-    
+
     @objc func sendNotificationToDevices() {
         print("called stop")
     }
-    
+
     @objc static func requiresMainQueueSetup() -> Bool {
         return false
     }
-    
+
     // Private functiomns
     func peripheralManagerDidUpdateState(_ peripheral: CBPeripheralManager) {
         print("updated state: \(peripheral.state)")
