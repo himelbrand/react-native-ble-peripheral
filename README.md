@@ -103,6 +103,26 @@ BLEPeripheral.addCharacteristicToService(ServiceUUID:string, UUID:string, permis
 https://developer.android.com/reference/android/bluetooth/BluetoothGattCharacteristic.html
 the link above is for permissions and properties constants info
 
+Permissions:
+1 - Readable
+2 - Readable Encrypted
+4 - Readable Encrypted MITM (Man-in-the-middle) Protection 
+16 - Writable
+32 - Writable Encrypted
+64 - Writable Encrypted MITM Protection
+128 - Writable Signed
+256 - Writable Signed MITM
+
+Properties:
+1 - Broadcastable
+2 - Readable
+4 - Writable without response
+8 - Writable
+16 - Supports notification
+32 - Supports indication
+64 - Signed Write
+128 - Extended properties
+
 ```javascript
 BLEPeripheral.addCharacteristicToService('XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX', 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX', 16 | 1, 8) //this is a Characteristic with read and write permissions and notify property
 ```
