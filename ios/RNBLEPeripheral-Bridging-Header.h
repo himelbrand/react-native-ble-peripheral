@@ -3,5 +3,5 @@
 //
 
 #import "React/RCTBridgeModule.h"
-#import "RCTEventDispatcher.h"
-#import "RCTEventEmitter.h"
+#import "React/RCTEventDispatcher.h"
+#import "React/RCTEventEmitter.h"
