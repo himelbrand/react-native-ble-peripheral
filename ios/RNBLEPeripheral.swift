@@ -15,18 +15,20 @@ class BLEPeripheral: NSObject, CBPeripheralManagerDelegate {
         print("BLEPeripheral initialized, advertising: \(advertising)")
     }
 
-    @objc func isAdvertising(_ resolve: RCTPromiseResolveBlock) -> Void {
+    @objc func isAdvertising(resolve: RCTPromiseResolveBlock) {
         resolve(advertising)
         print("called isAdvertising")
     }
-     
-    @objc func addService(_ uuid: String, _ primary: Bool)  -> Void {
+
+    @objc(addService:primary:)
+    func addService(uuid: String, primary: Bool) {
         let serviceUUID = CBUUID(string: uuid)
         if(servicesMap.keys.contains(uuid) != true){ servicesMap[uuid] = CBMutableService(type: serviceUUID, primary: primary) }
-        print("called addService")
+        print("called addService \(uuid)")
     }
 
-    @objc func addCharacteristicToService(_ serviceUUID: String, _ uuid: String, _ permissions: UInt, _ properties: UInt, _ data: String) -> Void {
+    @objc(addCharacteristicToService:uuid:permissions:properties:data:)
+    func addCharacteristicToService(serviceUUID: String, uuid: String, permissions: UInt, properties: UInt, data: String) {
         let characteristicUUID = CBUUID(string: uuid)
         let propertyValue = CBCharacteristicProperties(rawValue: properties)
         let permissionValue = CBAttributePermissions(rawValue: permissions)
@@ -35,19 +37,19 @@ class BLEPeripheral: NSObject, CBPeripheralManagerDelegate {
         servicesMap[serviceUUID]?.characteristics?.append(characteristic)
         print("called addCharacteristicToService")
     }
-     
-    @objc func start() -> Void {
+
+    @objc func start() {
         let advertisementData = [CBAdvertisementDataLocalNameKey: "Test data"]
         peripheralManager.startAdvertising(advertisementData)
         print("called start")
     }
 
-    @objc func stop() -> Void {
+    @objc func stop() {
         peripheralManager.stopAdvertising()
         print("called stop")
     }
 
-    @objc func sendNotificationToDevices() -> Void {
+    @objc func sendNotificationToDevices() {
         print("called stop")
     }
 
@@ -56,7 +58,7 @@ class BLEPeripheral: NSObject, CBPeripheralManagerDelegate {
     }
 
     // Private functiomns
-    func peripheralManagerDidUpdateState(_ peripheral: CBPeripheralManager) -> Void {
+    func peripheralManagerDidUpdateState(_ peripheral: CBPeripheralManager) {
         print("updated state: \(peripheral.state)")
     }
     

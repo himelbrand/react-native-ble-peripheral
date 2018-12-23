@@ -5,9 +5,17 @@
 
 // Best explanation: https://medium.com/@andrei.pfeiffer/react-natives-rct-extern-method-c61c17bf17b2
 
-RCT_EXTERN_METHOD(isAdvertising: (RCTPromiseResolveBlock)resolve)
-RCT_EXTERN_METHOD(addService: (String)uuid (Bool)primary)
-RCT_EXTERN_METHOD(addCharacteristicToService: (String)uid (UInt)permissiomns (UInt)properties (String)data)
+RCT_EXTERN_METHOD(isAdvertising:(RCTPromiseResolveBlock)resolve)
+RCT_EXTERN_METHOD(
+    addService:     (NSString *)uuid
+    primary:        (BOOL)primary
+)
+RCT_EXTERN_METHOD(
+    addCharacteristicToService: (NSString *)uid
+    permissions:                (NSInteger *)permissions
+    properties:                 (NSInteger *)properties
+    data:                       (NSString *)data
+)
 RCT_EXTERN_METHOD(start)
 RCT_EXTERN_METHOD(stop)
 RCT_EXTERN_METHOD(sendNotificationToDevices)
