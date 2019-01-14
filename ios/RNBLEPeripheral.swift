@@ -17,7 +17,7 @@ class BLEPeripheral: RCTEventEmitter, CBPeripheralManagerDelegate {
         manager = CBPeripheralManager(delegate: self, queue: nil, options: nil)
         print("BLEPeripheral initialized, advertising: \(advertising)")
     }
-    
+
     @objc func isAdvertising(_ resolve: RCTPromiseResolveBlock, rejecter reject: RCTPromiseRejectBlock) {
         resolve(advertising)
         print("called isAdvertising")
@@ -48,9 +48,8 @@ class BLEPeripheral: RCTEventEmitter, CBPeripheralManagerDelegate {
         servicesMap[serviceUUID]?.characteristics?.append(characteristic)
         print("added characteristic to service")
     }
-    
-    @objc(start:reject:)
-    func start(_ resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
+
+    @objc func start(_ resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
         if (manager.state != .poweredOn) {
             self.alertJS("Bluetooth turned off")
             return;
