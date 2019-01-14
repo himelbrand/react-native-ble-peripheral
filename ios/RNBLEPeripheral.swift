@@ -4,18 +4,21 @@ import Foundation
 import CoreBluetooth
 
 @objc(BLEPeripheral)
-class BLEPeripheral: NSObject, CBPeripheralManagerDelegate {
+class BLEPeripheral: RCTEventEmitter, CBPeripheralManagerDelegate {
     var advertising: Bool = false
-    var peripheralManager: CBPeripheralManager!
+    var hasListeners: Bool = false
     var servicesMap = Dictionary<String, CBMutableService>()
-    
+    var manager: CBPeripheralManager!
+    var startPromiseResolve: RCTPromiseResolveBlock?
+    var startPromiseReject: RCTPromiseRejectBlock?
+
     override init() {
         super.init()
-        peripheralManager = CBPeripheralManager(delegate: self, queue: nil, options: nil)
+        manager = CBPeripheralManager(delegate: self, queue: nil, options: nil)
         print("BLEPeripheral initialized, advertising: \(advertising)")
     }
-
-    @objc func isAdvertising(resolve: RCTPromiseResolveBlock) {
+    
+    @objc func isAdvertising(_ resolve: RCTPromiseResolveBlock, rejecter reject: RCTPromiseRejectBlock) {
         resolve(advertising)
         print("called isAdvertising")
     }
@@ -23,10 +26,18 @@ class BLEPeripheral: NSObject, CBPeripheralManagerDelegate {
     @objc(addService:primary:)
     func addService(uuid: String, primary: Bool) {
         let serviceUUID = CBUUID(string: uuid)
-        if(servicesMap.keys.contains(uuid) != true){ servicesMap[uuid] = CBMutableService(type: serviceUUID, primary: primary) }
-        print("called addService \(uuid)")
+        let service = CBMutableService(type: serviceUUID, primary: primary)
+        if(servicesMap.keys.contains(uuid) != true){
+            servicesMap[uuid] = service
+            manager.add(service)
+            print("added service \(uuid)")
+        }
+        else {
+            print("service \(uuid) already there")
+            self.alertJS("service \(uuid) already there")
+        }
     }
-
+    
     @objc(addCharacteristicToService:uuid:permissions:properties:data:)
     func addCharacteristicToService(serviceUUID: String, uuid: String, permissions: UInt, properties: UInt, data: String) {
         let characteristicUUID = CBUUID(string: uuid)
@@ -35,29 +46,83 @@ class BLEPeripheral: NSObject, CBPeripheralManagerDelegate {
         let byteData: Data = data.data(using: .utf8)!
         let characteristic = CBMutableCharacteristic( type: characteristicUUID, properties: propertyValue, value: byteData, permissions: permissionValue)
         servicesMap[serviceUUID]?.characteristics?.append(characteristic)
-        print("called addCharacteristicToService")
+        print("added characteristic to service")
     }
+    
+    @objc(start:reject:)
+    func start(_ resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
+        if (manager.state != .poweredOn) {
+            self.alertJS("Bluetooth turned off")
+            return;
+        }
 
-    @objc func start() {
+        self.startPromiseResolve = resolve
+        self.startPromiseReject = reject
+
         let advertisementData = [CBAdvertisementDataLocalNameKey: "Test data"]
-        peripheralManager.startAdvertising(advertisementData)
-        print("called start")
-    }
+        // manager.startAdvertising([CBAdvertisementDataServiceUUIDsKey : [service.UUID]])
 
+        manager.startAdvertising(advertisementData)
+    }
+    
     @objc func stop() {
-        peripheralManager.stopAdvertising()
+        manager.stopAdvertising()
+        self.advertising = false
         print("called stop")
     }
-
+    
     @objc func sendNotificationToDevices() {
         print("called stop")
     }
-
-    @objc static func requiresMainQueueSetup() -> Bool {
+    
+    @objc override func supportedEvents() -> [String]! {
+        return ["onWarning"]
+    }
+    
+    override func startObserving()
+    {
+        hasListeners = true
+    }
+    
+    override func stopObserving()
+    {
+        hasListeners = false
+    }
+    
+    @objc override static func requiresMainQueueSetup() -> Bool {
         return false
     }
+    
+    // Private functions
+    
+    func alertJS(_ message: Any) {
+        if(self.hasListeners) {
+            sendEvent(withName: "onWarning", body: message)
+        }
+    }
 
-    // Private functiomns
+    func peripheralManager(_ peripheral: CBPeripheralManager, didAdd service: CBService, error: Error?) {
+        if let error = error {
+            print("error: \(error)")
+            self.alertJS("error: \(error)")
+            return
+        }
+        print("service: \(service)")
+    }
+    
+    func peripheralManagerDidStartAdvertising(_ peripheral: CBPeripheralManager, error: Error?) {
+        if let error = error {
+            print("advertising failed. error: \(error)")
+            self.alertJS("advertising failed. error: \(error)")
+            self.advertising = false
+            self.startPromiseReject!("AD_ERR", "advertising failed", error)
+            return
+        }
+        self.advertising = true
+        self.startPromiseResolve!(self.advertising)
+        print("advertising succeeded!")
+    }
+
     func peripheralManagerDidUpdateState(_ peripheral: CBPeripheralManager) {
         print("updated state: \(peripheral.state)")
     }
