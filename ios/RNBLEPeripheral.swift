@@ -1,4 +1,4 @@
-//  Created by Eskel on 12/12/2018.
+//  Created by Eskel on 12/12/2018
 
 import Foundation
 import CoreBluetooth
@@ -37,7 +37,7 @@ class BLEPeripheral: RCTEventEmitter, CBPeripheralManagerDelegate {
             self.alertJS("service \(uuid) already there")
         }
     }
-    
+
     @objc(addCharacteristicToService:uuid:permissions:properties:data:)
     func addCharacteristicToService(serviceUUID: String, uuid: String, permissions: UInt, properties: UInt, data: String) {
         let characteristicUUID = CBUUID(string: uuid)
@@ -58,6 +58,7 @@ class BLEPeripheral: RCTEventEmitter, CBPeripheralManagerDelegate {
         self.startPromiseResolve = resolve
         self.startPromiseReject = reject
 
+        // Add both keys to data array: UUID and Local name
         let advertisementData = [CBAdvertisementDataLocalNameKey: "Test data"]
         // manager.startAdvertising([CBAdvertisementDataServiceUUIDsKey : [service.UUID]])
 
@@ -78,22 +79,8 @@ class BLEPeripheral: RCTEventEmitter, CBPeripheralManagerDelegate {
         return ["onWarning"]
     }
     
-    override func startObserving()
-    {
-        hasListeners = true
-    }
-    
-    override func stopObserving()
-    {
-        hasListeners = false
-    }
-    
-    @objc override static func requiresMainQueueSetup() -> Bool {
-        return false
-    }
-    
     // Private functions
-    
+
     func alertJS(_ message: Any) {
         if(self.hasListeners) {
             sendEvent(withName: "onWarning", body: message)
@@ -123,7 +110,34 @@ class BLEPeripheral: RCTEventEmitter, CBPeripheralManagerDelegate {
     }
 
     func peripheralManagerDidUpdateState(_ peripheral: CBPeripheralManager) {
-        print("updated state: \(peripheral.state)")
+        var state: Any
+        if #available(iOS 10.0, *) {
+            state = peripheral.state.description
+        } else {
+            state = peripheral.state
+        }
+        self.alertJS("BT state change: \(state)")
+        print("state did update: \(state)")
     }
+
+    // Helpers
     
+    override func startObserving() { hasListeners = true }
+    override func stopObserving() { hasListeners = false }
+    @objc override static func requiresMainQueueSetup() -> Bool { return false }
+
+}
+
+@available(iOS 10.0, *)
+extension CBManagerState: CustomStringConvertible {
+    public var description: String {
+        switch self {
+        case .poweredOff: return ".poweredOff"
+        case .poweredOn: return ".poweredOn"
+        case .resetting: return ".resetting"
+        case .unauthorized: return ".unauthorized"
+        case .unknown: return ".unknown"
+        case .unsupported: return ".unsupported"
+        }
+    }
 }
