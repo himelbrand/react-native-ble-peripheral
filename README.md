@@ -128,8 +128,8 @@ BLEPeripheral.addCharacteristicToService('XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX',
 ```
 #### Notify to devices
 BLEPeripheral.sendNotificationToDevices(ServiceUUID:string, CharacteristicUUID:string, data:byte[]) 
-note #1: in js it's not really a byte array, but an array of numbers
-note #2: the CharacteristicUUID must be of a Characteristic with notify property
+- note #1: in js it's not really a byte array, but an array of numbers
+- note #2: the CharacteristicUUID must be of a Characteristic with notify property
 ```javascript
 BLEPeripheral.sendNotificationToDevices('XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX', 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX', [0x10,0x01,0xA1,0x80]) //sends a notification to all connected devices that, using the char uuid given
 ```

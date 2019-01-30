@@ -12,11 +12,14 @@ RCT_EXTERN_METHOD(
     rejecter: (RCTPromiseRejectBlock)reject
 )
 RCT_EXTERN_METHOD(
+    setName: (NSString *)string
+)
+RCT_EXTERN_METHOD(
     addService: (NSString *)uuid
     primary:    (BOOL)primary
 )
 RCT_EXTERN_METHOD(
-    addCharacteristicToService: (NSString *)uid
+    addCharacteristicToService: (NSString *)uuid
     permissions:                (NSInteger *)permissions
     properties:                 (NSInteger *)properties
     data:                       (NSString *)data
@@ -27,7 +30,10 @@ RCT_EXTERN_METHOD(
     rejecter:   (RCTPromiseRejectBlock)reject
 )
 RCT_EXTERN_METHOD(stop)
-RCT_EXTERN_METHOD(sendNotificationToDevices)
+RCT_EXTERN_METHOD(
+    sendNotificationToDevices: (NSString *)characteristicUUID
+    data: (NSString *)data
+)
 RCT_EXTERN_METHOD(requiresMainQueueSetup)
 
 @end
