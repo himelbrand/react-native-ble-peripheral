@@ -151,5 +151,5 @@ note:use this only after adding services and characteristics
 ```
 
 DOCs and project is under development 
-Any help would be welcom...
+Any help would be welcome...
 feel free to contact me
