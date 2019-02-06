@@ -153,7 +153,7 @@ note:use this only after adding services and characteristics
 #### Set name (optional)
 BLEPeripheral.setName(name:string)
 
-This method sets the name of the device broadcast.
+This method sets the name of the device broadcast, before calling `start`.
 ```javascript
 BLEPeripheral.setName('RNBLETEST')
 ```

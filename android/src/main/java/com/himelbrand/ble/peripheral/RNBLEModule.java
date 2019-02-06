@@ -69,6 +69,7 @@ public class RNBLEModule extends ReactContextBaseJavaModule{
     BluetoothGattServer mGattServer;
     BluetoothLeAdvertiser advertiser;
     AdvertiseCallback advertisingCallback;
+    String name;
     boolean advertising;
     private Context context;
 
@@ -78,6 +79,7 @@ public class RNBLEModule extends ReactContextBaseJavaModule{
         this.context = reactContext;
         this.servicesMap = new HashMap<String, BluetoothGattService>();
         this.advertising = false;
+        this.name = "React Native BLE Peripheral";
     }
 
     @Override
@@ -87,8 +89,8 @@ public class RNBLEModule extends ReactContextBaseJavaModule{
 
     @ReactMethod
     public void setName(String name) {
-        this.mBluetoothAdapter.setName(name);
-        Log.info("RNBLEModule", "name set to " + name);
+        this.name = name;
+        Log.i("RNBLEModule", "name set to " + name);
     }
 
     @ReactMethod
@@ -151,7 +153,7 @@ public class RNBLEModule extends ReactContextBaseJavaModule{
             WritableArray data = Arguments.createArray();
             for (byte b : value){
                 data.pushInt((int)b);
-            }y
+            }
             map.putArray("data",data);
             map.putString("device",device.toString());
             if (responseNeeded) {
@@ -169,6 +171,7 @@ public class RNBLEModule extends ReactContextBaseJavaModule{
     public void start(final Promise promise){
         mBluetoothManager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
         mBluetoothAdapter = mBluetoothManager.getAdapter();
+        mBluetoothAdapter.setName(this.name);
         // Ensures Bluetooth is available on the device and it is enabled. If not,
 // displays a dialog requesting user permission to enable Bluetooth.
 
@@ -197,7 +200,7 @@ public class RNBLEModule extends ReactContextBaseJavaModule{
             public void onStartSuccess(AdvertiseSettings settingsInEffect) {
                 super.onStartSuccess(settingsInEffect);
                 advertising = true;
-                promise.resolve("Succes, Started Advertising");
+                promise.resolve("Success, Started Advertising");
 
             }
 
@@ -236,7 +239,7 @@ public class RNBLEModule extends ReactContextBaseJavaModule{
                 & BluetoothGattCharacteristic.PROPERTY_INDICATE)
                 == BluetoothGattCharacteristic.PROPERTY_INDICATE;
         for (BluetoothDevice device : mBluetoothDevices) {
-            // true for indication (acknowledge) and false for notification (unacknowledge).
+            // true for indication (acknowledge) and false for notification (un-acknowledge).
             mGattServer.notifyCharacteristicChanged(device, characteristic, indicate);
         }
     }
