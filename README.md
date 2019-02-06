@@ -159,5 +159,5 @@ BLEPeripheral.setName('RNBLETEST')
 ```
 
 DOCs and project is under development 
-Any help would be welcom...
+Any help would be welcome...
 feel free to contact me
