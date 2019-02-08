@@ -79,7 +79,7 @@ public class RNBLEModule extends ReactContextBaseJavaModule{
         this.context = reactContext;
         this.servicesMap = new HashMap<String, BluetoothGattService>();
         this.advertising = false;
-        this.name = "React Native BLE Peripheral";
+        this.name = "RN_BLE";
     }
 
     @Override
@@ -194,6 +194,7 @@ public class RNBLEModule extends ReactContextBaseJavaModule{
             dataBuilder.addServiceUuid(new ParcelUuid(service.getUuid()));
         }
         AdvertiseData data = dataBuilder.build();
+        Log.i("RNBLEModule", data.toString());
 
         advertisingCallback = new AdvertiseCallback() {
             @Override

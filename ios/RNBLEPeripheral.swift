@@ -7,7 +7,7 @@ import CoreBluetooth
 class BLEPeripheral: RCTEventEmitter, CBPeripheralManagerDelegate {
     var advertising: Bool = false
     var hasListeners: Bool = false
-    var name: String = "React Native BLE Peripheral"
+    var name: String = "RN_BLE"
     var servicesMap = Dictionary<String, CBMutableService>()
     var manager: CBPeripheralManager!
     var startPromiseResolve: RCTPromiseResolveBlock?

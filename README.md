@@ -145,6 +145,14 @@ note:use this only after adding services and characteristics
   })
 ```
 
+In case of error, these are the error codes:
+* 1 - Failed to start advertising as the advertise data to be broadcasted is larger than 31 bytes.
+* 2 - Failed to start advertising because no advertising instance is available.
+* 3 - Failed to start advertising as the advertising is already started.
+* 4 - Operation failed due to an internal error.
+* 5 - This feature is not supported on this platform.
+
+
 #### stop Advertising 
 ```javascript
  BLEPeripheral.stop()
