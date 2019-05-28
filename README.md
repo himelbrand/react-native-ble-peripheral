@@ -1,6 +1,5 @@
 # React Native BLE Peripheral
 Native BLE Peripheral in React Native
-**IOS support was added in version**
 ## Welcome
 
 This is a simulator for a BLE peripheral, to help with testing BLE apps without an actual peripheral BLE device
@@ -10,6 +9,7 @@ for all ready parts see documentation below.
 
 ## Realease notes
 - fixed issues fixed on github repo in npm package - starting from version 1.2.0
+- **IOS support was added in version 2.0.0**
     
 ### Still missing
 
