@@ -103,13 +103,33 @@ BLEPeripheral.addCharacteristicToService(ServiceUUID:string, UUID:string, permis
 https://developer.android.com/reference/android/bluetooth/BluetoothGattCharacteristic.html
 the link above is for permissions and properties constants info
 
+Permissions:
+* 1 - Readable
+* 2 - Readable Encrypted
+* 4 - Readable Encrypted MITM (Man-in-the-middle) Protection 
+* 16 - Writable
+* 32 - Writable Encrypted
+* 64 - Writable Encrypted MITM Protection
+* 128 - Writable Signed
+* 256 - Writable Signed MITM
+
+Properties:
+* 1 - Broadcastable
+* 2 - Readable
+* 4 - Writable without response
+* 8 - Writable
+* 16 - Supports notification
+* 32 - Supports indication
+* 64 - Signed Write
+* 128 - Extended properties
+
 ```javascript
 BLEPeripheral.addCharacteristicToService('XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX', 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX', 16 | 1, 8) //this is a Characteristic with read and write permissions and notify property
 ```
 #### Notify to devices
 BLEPeripheral.sendNotificationToDevices(ServiceUUID:string, CharacteristicUUID:string, data:byte[]) 
-note #1: in js it's not really a byte array, but an array of numbers
-note #2: the CharacteristicUUID must be of a Characteristic with notify property
+- note #1: in js it's not really a byte array, but an array of numbers
+- note #2: the CharacteristicUUID must be of a Characteristic with notify property
 ```javascript
 BLEPeripheral.sendNotificationToDevices('XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX', 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX', [0x10,0x01,0xA1,0x80]) //sends a notification to all connected devices that, using the char uuid given
 ```
@@ -125,11 +145,27 @@ note:use this only after adding services and characteristics
   })
 ```
 
+In case of error, these are the error codes:
+* 1 - Failed to start advertising as the advertise data to be broadcasted is larger than 31 bytes.
+* 2 - Failed to start advertising because no advertising instance is available.
+* 3 - Failed to start advertising as the advertising is already started.
+* 4 - Operation failed due to an internal error.
+* 5 - This feature is not supported on this platform.
+
+
 #### stop Advertising 
 ```javascript
  BLEPeripheral.stop()
 ```
 
+#### Set name (optional)
+BLEPeripheral.setName(name:string)
+
+This method sets the name of the device broadcast, before calling `start`.
+```javascript
+BLEPeripheral.setName('RNBLETEST')
+```
+
 DOCs and project is under development 
-Any help would be welcom...
+Any help would be welcome...
 feel free to contact me

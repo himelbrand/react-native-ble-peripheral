@@ -69,6 +69,7 @@ public class RNBLEModule extends ReactContextBaseJavaModule{
     BluetoothGattServer mGattServer;
     BluetoothLeAdvertiser advertiser;
     AdvertiseCallback advertisingCallback;
+    String name;
     boolean advertising;
     private Context context;
 
@@ -78,6 +79,7 @@ public class RNBLEModule extends ReactContextBaseJavaModule{
         this.context = reactContext;
         this.servicesMap = new HashMap<String, BluetoothGattService>();
         this.advertising = false;
+        this.name = "RN_BLE";
     }
 
     @Override
@@ -85,7 +87,11 @@ public class RNBLEModule extends ReactContextBaseJavaModule{
         return "BLEPeripheral";
     }
 
-
+    @ReactMethod
+    public void setName(String name) {
+        this.name = name;
+        Log.i("RNBLEModule", "name set to " + name);
+    }
 
     @ReactMethod
     public void addService(String uuid, Boolean primary) {
@@ -124,7 +130,7 @@ public class RNBLEModule extends ReactContextBaseJavaModule{
             super.onCharacteristicReadRequest(device, requestId, offset, characteristic);
             if (offset != 0) {
                 mGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_INVALID_OFFSET, offset,
-            /* value (optional) */ null);
+                        /* value (optional) */ null);
                 return;
             }
             mGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS,
@@ -136,13 +142,13 @@ public class RNBLEModule extends ReactContextBaseJavaModule{
             super.onNotificationSent(device, status);
         }
 
-        
+
         public void onCharacteristicWriteRequest(BluetoothDevice device, int requestId,
                                                  BluetoothGattCharacteristic characteristic, boolean preparedWrite, boolean responseNeeded,
                                                  int offset, byte[] value, Promise promise) {
             super.onCharacteristicWriteRequest(device, requestId, characteristic, preparedWrite,
                     responseNeeded, offset, value);
-                    characteristic.setValue(value);
+            characteristic.setValue(value);
             WritableMap map = Arguments.createMap();
             WritableArray data = Arguments.createArray();
             for (byte b : value){
@@ -152,8 +158,8 @@ public class RNBLEModule extends ReactContextBaseJavaModule{
             map.putString("device",device.toString());
             if (responseNeeded) {
                 mGattServer.sendResponse(device, requestId, 1,
-            /* No need to respond with an offset */ 0,
-            /* No need to respond with a value */ value);
+                        /* No need to respond with an offset */ 0,
+                        /* No need to respond with a value */ value);
             }
             promise.resolve(map);
         }
@@ -165,6 +171,7 @@ public class RNBLEModule extends ReactContextBaseJavaModule{
     public void start(final Promise promise){
         mBluetoothManager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
         mBluetoothAdapter = mBluetoothManager.getAdapter();
+        mBluetoothAdapter.setName(this.name);
         // Ensures Bluetooth is available on the device and it is enabled. If not,
 // displays a dialog requesting user permission to enable Bluetooth.
 
@@ -187,13 +194,14 @@ public class RNBLEModule extends ReactContextBaseJavaModule{
             dataBuilder.addServiceUuid(new ParcelUuid(service.getUuid()));
         }
         AdvertiseData data = dataBuilder.build();
+        Log.i("RNBLEModule", data.toString());
 
         advertisingCallback = new AdvertiseCallback() {
             @Override
             public void onStartSuccess(AdvertiseSettings settingsInEffect) {
                 super.onStartSuccess(settingsInEffect);
                 advertising = true;
-                promise.resolve("Succes, Started Advertising");
+                promise.resolve("Success, Started Advertising");
 
             }
 
@@ -232,7 +240,7 @@ public class RNBLEModule extends ReactContextBaseJavaModule{
                 & BluetoothGattCharacteristic.PROPERTY_INDICATE)
                 == BluetoothGattCharacteristic.PROPERTY_INDICATE;
         for (BluetoothDevice device : mBluetoothDevices) {
-            // true for indication (acknowledge) and false for notification (unacknowledge).
+            // true for indication (acknowledge) and false for notification (un-acknowledge).
             mGattServer.notifyCharacteristicChanged(device, characteristic, indicate);
         }
     }
