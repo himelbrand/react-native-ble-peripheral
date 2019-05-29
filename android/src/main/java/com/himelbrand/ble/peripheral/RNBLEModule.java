@@ -142,29 +142,24 @@ public class RNBLEModule extends ReactContextBaseJavaModule{
             super.onNotificationSent(device, status);
         }
 
-
+        @Override
         public void onCharacteristicWriteRequest(BluetoothDevice device, int requestId,
                                                  BluetoothGattCharacteristic characteristic, boolean preparedWrite, boolean responseNeeded,
-                                                 int offset, byte[] value, Promise promise) {
+                                                 int offset, byte[] value) {
             super.onCharacteristicWriteRequest(device, requestId, characteristic, preparedWrite,
                     responseNeeded, offset, value);
             characteristic.setValue(value);
             WritableMap map = Arguments.createMap();
             WritableArray data = Arguments.createArray();
-            for (byte b : value){
-                data.pushInt((int)b);
+            for (byte b : value) {
+                data.pushInt((int) b);
             }
-            map.putArray("data",data);
-            map.putString("device",device.toString());
+            map.putArray("data", data);
+            map.putString("device", device.toString());
             if (responseNeeded) {
-                mGattServer.sendResponse(device, requestId, 1,
-                        /* No need to respond with an offset */ 0,
-                        /* No need to respond with a value */ value);
+                mGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset, value);
             }
-            promise.resolve(map);
         }
-
-
     };
 
     @ReactMethod
