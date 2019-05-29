@@ -10,6 +10,7 @@ for all ready parts see documentation below.
 ## Realease notes
 - fixed issues fixed on github repo in npm package - starting from version 1.2.0
 - **IOS support was added in version 2.0.0**
+- merged PR to fix write charicaristics - version 2.0.1
     
 ### Still missing
 
