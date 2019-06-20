@@ -3,6 +3,7 @@
   "version": "2.0.0",
   "description": "a simulator for a BLE peripheral, to help with testing BLE apps without an actual peripheral BLE device",
   "main": "index.js",
+  "types": "index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
