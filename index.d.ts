@@ -11,7 +11,7 @@ declare module "react-native-ble-peripheral" {
     CharacteristicUUID: string,
     data: number[]
   ): void;
-  function start(): Promise<void>;
+  function start(): Promise<boolean>;
   function stop(): void;
   function setName(name: string): void;
   function isAdvertising(): Promise<boolean>;
