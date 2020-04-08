@@ -21,6 +21,11 @@ class BLEPeripheral: RCTEventEmitter, CBPeripheralManagerDelegate {
     
     //// PUBLIC METHODS
 
+    @objc func isAdvertisementSupported(_ resolve: RCTPromiseResolveBlock, rejecter reject: RCTPromiseRejectBlock) {
+        resolve(True)
+        print("called isAdvertisementSupported")
+    }
+
     @objc func setName(_ name: String) {
         self.name = name
         print("name set to \(name)")

@@ -4,7 +4,6 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
-import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattServer;
 import android.bluetooth.BluetoothGattServerCallback;
 import android.bluetooth.BluetoothGattService;
@@ -13,73 +12,68 @@ import android.bluetooth.le.AdvertiseCallback;
 import android.bluetooth.le.AdvertiseData;
 import android.bluetooth.le.AdvertiseSettings;
 import android.bluetooth.le.BluetoothLeAdvertiser;
-import android.bluetooth.le.BluetoothLeScanner;
-import android.bluetooth.le.ScanCallback;
-import android.bluetooth.le.ScanFilter;
-import android.bluetooth.le.ScanResult;
-import android.bluetooth.le.ScanSettings;
 import android.content.Context;
-import android.os.Bundle;
-import android.os.Handler;
+import android.os.Build;
 import android.os.ParcelUuid;
-import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
+import androidx.annotation.NonNull;
 import android.util.Log;
 
-
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
-
-import android.content.Intent;
-import android.net.Uri;
-import android.widget.Toast;
-
+import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.NativeModule;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
-import com.facebook.react.common.MapBuilder;
-import com.facebook.react.bridge.Promise;
-import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableArray;
+import com.facebook.react.bridge.WritableMap;
 
-
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.UUID;
 
 /**
  * {@link NativeModule} that allows JS to open the default browser
  * for an url.
  */
 public class RNBLEModule extends ReactContextBaseJavaModule{
+    public static final String ERROR_BLUETOOTH_POWERED_OFF = "BluetoothPoweredOff";
 
-    ReactApplicationContext reactContext;
-    HashMap<String, BluetoothGattService> servicesMap;
-    HashSet<BluetoothDevice> mBluetoothDevices;
-    BluetoothManager mBluetoothManager;
-    BluetoothAdapter mBluetoothAdapter;
-    BluetoothGattServer mGattServer;
-    BluetoothLeAdvertiser advertiser;
-    AdvertiseCallback advertisingCallback;
-    String name;
-    boolean advertising;
-    private Context context;
+    private final ReactApplicationContext reactContext;
+    private final Context context;
+
+    private final BluetoothManager mBluetoothManager;
+    private final BluetoothAdapter mBluetoothAdapter;
+
+    private final HashMap<String, BluetoothGattService> servicesMap;
+    private HashSet<BluetoothDevice> mBluetoothDevices;
+    private BluetoothGattServer mGattServer;
+    private BluetoothLeAdvertiser advertiser;
+    private AdvertiseCallback advertisingCallback;
+    private String name;
+    private boolean advertising;
 
     public RNBLEModule(ReactApplicationContext reactContext) {
         super(reactContext);
         this.reactContext = reactContext;
         this.context = reactContext;
-        this.servicesMap = new HashMap<String, BluetoothGattService>();
+        this.servicesMap = new HashMap<>();
         this.advertising = false;
         this.name = "RN_BLE";
+
+        mBluetoothManager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
+        mBluetoothAdapter = mBluetoothManager.getAdapter();
+    }
+
+    @ReactMethod
+    public void isAdvertisementSupported(@NonNull Promise promise) {
+        if (!mBluetoothAdapter.isEnabled()) {
+            promise.reject(ERROR_BLUETOOTH_POWERED_OFF, "Enable Bluetooth to perform a check");
+            return;
+        }
+        final boolean supported = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                && mBluetoothAdapter.isMultipleAdvertisementSupported();
+        promise.resolve(supported);
     }
 
     @Override
@@ -164,8 +158,6 @@ public class RNBLEModule extends ReactContextBaseJavaModule{
 
     @ReactMethod
     public void start(final Promise promise){
-        mBluetoothManager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
-        mBluetoothAdapter = mBluetoothManager.getAdapter();
         mBluetoothAdapter.setName(this.name);
         // Ensures Bluetooth is available on the device and it is enabled. If not,
 // displays a dialog requesting user permission to enable Bluetooth.
@@ -227,7 +219,7 @@ public class RNBLEModule extends ReactContextBaseJavaModule{
     public void sendNotificationToDevices(String serviceUUID,String charUUID,ReadableArray message) {
         byte[] decoded = new byte[message.size()];
         for (int i = 0; i < message.size(); i++) {
-            decoded[i] = new Integer(message.getInt(i)).byteValue();
+            decoded[i] = Integer.valueOf(message.getInt(i)).byteValue();
         }
         BluetoothGattCharacteristic characteristic = servicesMap.get(serviceUUID).getCharacteristic(UUID.fromString(charUUID));
         characteristic.setValue(decoded);
