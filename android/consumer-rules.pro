@@ -1,0 +1,1 @@
+-dontwarn com.himelbrand.ble.peripheral.**
