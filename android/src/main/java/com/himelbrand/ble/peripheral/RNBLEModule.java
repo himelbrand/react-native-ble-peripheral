@@ -222,6 +222,7 @@ public class RNBLEModule extends ReactContextBaseJavaModule{
             // pointer exception is raised.
             advertiser.stopAdvertising(advertisingCallback);
         }
+        advertising = false;
     }
     @ReactMethod
     public void sendNotificationToDevices(String serviceUUID,String charUUID,ReadableArray message) {
